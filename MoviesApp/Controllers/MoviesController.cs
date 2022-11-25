@@ -32,9 +32,15 @@ namespace MoviesApp.Controllers
                     Price = m.Price,
                     Title = m.Title,
                     ReleaseDate = m.ReleaseDate,
-                    Actors = m.Actors
+                    Actors = m.Actors.Select(a => new ActorViewModel()
+                    {
+                        Id = a.Id,
+                        Name = a.Name,
+                        LastName = a.LastName,
+                        BirthDate = a.BirthDate,
+                    }).ToList()
                 })
-                .AsEnumerable();
+                .ToList();
 
             return View(movies);
         }

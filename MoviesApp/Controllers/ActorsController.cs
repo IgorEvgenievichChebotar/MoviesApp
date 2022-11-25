@@ -30,9 +30,16 @@ public class ActorsController : Controller
                 Name = a.Name,
                 LastName = a.LastName,
                 BirthDate = a.BirthDate,
-                Movies = a.Movies
+                Movies = a.Movies.Select(m => new MovieViewModel
+                {
+                    Id = m.Id,
+                    Title = m.Title,
+                    Price = m.Price,
+                    Genre = m.Genre,
+                    ReleaseDate = m.ReleaseDate,
+                }).ToList()
             })
-            .AsEnumerable();
+            .ToList();
 
         return View(list);
     }

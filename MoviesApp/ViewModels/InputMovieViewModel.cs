@@ -13,6 +13,6 @@ namespace MoviesApp.ViewModels
         public DateTime ReleaseDate { get; set; }
         public string Genre { get; set; }
         public decimal Price { get; set; }
-        public virtual ICollection<Actor> Actors { get; set; } = new List<Actor>();
+        public virtual ICollection<ActorViewModel> Actors { get; set; } = new List<ActorViewModel>();
     }
 }
