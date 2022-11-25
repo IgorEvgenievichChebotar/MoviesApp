@@ -1,4 +1,3 @@
-@using System.Linq
 @model IEnumerable<MoviesApp.ViewModels.MovieViewModel>
 
 @{
@@ -25,6 +24,9 @@
         <th>
             <label asp-for="@Model.First().Price"></label>
         </th>
+        <th>
+            <label asp-for="@Model.First().Actors"></label>
+        </th>
         <th></th>
     </tr>
     </thead>
@@ -47,7 +49,7 @@
             <td>
                 @foreach (var a in item.Actors)
                 {
-                    <b>@a.Name</b>
+                    <a>@a.Name @a.LastName, </a>
                 }
             </td>
             <td>

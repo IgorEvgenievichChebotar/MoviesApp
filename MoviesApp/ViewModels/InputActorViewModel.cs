@@ -12,5 +12,5 @@ public class InputActorViewModel
 
     [DataType(DataType.Date)] 
     public DateTime BirthDate { get; set; }
-    public virtual ICollection<Movie> Movies { get; } = new List<Movie>();
+    public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
 }

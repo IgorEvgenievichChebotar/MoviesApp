@@ -22,12 +22,19 @@ public class ActorsController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        return View(_context.Actors.Select(a => new ActorViewModel
-        {
-            Name = a.Name,
-            LastName = a.LastName,
-            BirthDate = a.BirthDate
-        }).ToList());
+        var list = _context.Actors
+            .Include(a => a.Movies)
+            .Select(a => new ActorViewModel
+            {
+                Id = a.Id,
+                Name = a.Name,
+                LastName = a.LastName,
+                BirthDate = a.BirthDate,
+                Movies = a.Movies
+            })
+            .AsEnumerable();
+
+        return View(list);
     }
 
     [HttpGet]
@@ -133,7 +140,7 @@ public class ActorsController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-    
+
     [HttpGet]
     public IActionResult Delete(int? id)
     {
@@ -169,7 +176,7 @@ public class ActorsController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-    
+
     private bool ActorExists(int id)
     {
         return _context.Actors.Any(a => a.Id == id);

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +12,7 @@ namespace MoviesApp.Controllers
     {
         private readonly MoviesContext _context;
         private readonly ILogger<HomeController> _logger;
-
-
+        
         public MoviesController(MoviesContext context, ILogger<HomeController> logger)
         {
             _context = context;
@@ -25,14 +23,20 @@ namespace MoviesApp.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View(_context.Movies.Select(m => new MovieViewModel
-            {
-                Id = m.Id,
-                Genre = m.Genre,
-                Price = m.Price,
-                Title = m.Title,
-                ReleaseDate = m.ReleaseDate
-            }).ToList());
+            var movies = _context.Movies
+                .Include(m => m.Actors)
+                .Select(m => new MovieViewModel
+                {
+                    Id = m.Id,
+                    Genre = m.Genre,
+                    Price = m.Price,
+                    Title = m.Title,
+                    ReleaseDate = m.ReleaseDate,
+                    Actors = m.Actors
+                })
+                .AsEnumerable();
+
+            return View(movies);
         }
 
         // GET: Movies/Details/5
@@ -89,6 +93,7 @@ namespace MoviesApp.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+
             return View(inputModel);
         }
 
@@ -162,12 +167,12 @@ namespace MoviesApp.Controllers
             }
 
             var deleteModel = _context.Movies.Where(m => m.Id == id).Select(m => new DeleteMovieViewModel
-                {
-                    Genre = m.Genre,
-                    Price = m.Price,
-                    Title = m.Title,
-                    ReleaseDate = m.ReleaseDate
-                }).FirstOrDefault();
+            {
+                Genre = m.Genre,
+                Price = m.Price,
+                Title = m.Title,
+                ReleaseDate = m.ReleaseDate
+            }).FirstOrDefault();
 
             if (deleteModel == null)
             {
