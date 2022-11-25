@@ -9,7 +9,7 @@ using MoviesApp.ViewModels;
 
 namespace MoviesApp.Controllers
 {
-    public class MoviesController: Controller
+    public class MoviesController : Controller
     {
         private readonly MoviesContext _context;
         private readonly ILogger<HomeController> _logger;
@@ -53,7 +53,7 @@ namespace MoviesApp.Controllers
                 ReleaseDate = m.ReleaseDate
             }).FirstOrDefault();
 
-            
+
             if (viewModel == null)
             {
                 return NotFound();
@@ -61,7 +61,7 @@ namespace MoviesApp.Controllers
 
             return View(viewModel);
         }
-        
+
         // GET: Movies/Create
         [HttpGet]
         public IActionResult Create()
@@ -91,7 +91,7 @@ namespace MoviesApp.Controllers
             }
             return View(inputModel);
         }
-        
+
         [HttpGet]
         // GET: Movies/Edit/5
         public IActionResult Edit(int? id)
@@ -108,12 +108,12 @@ namespace MoviesApp.Controllers
                 Title = m.Title,
                 ReleaseDate = m.ReleaseDate
             }).FirstOrDefault();
-            
+
             if (editModel == null)
             {
                 return NotFound();
             }
-            
+
             return View(editModel);
         }
 
@@ -124,38 +124,34 @@ namespace MoviesApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("Title,ReleaseDate,Genre,Price")] EditMovieViewModel editModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(editModel);
+            try
             {
-                try
+                var movie = new Movie
                 {
-                    var movie = new Movie
-                    {
-                        Id = id,
-                        Genre = editModel.Genre,
-                        Price = editModel.Price,
-                        Title = editModel.Title,
-                        ReleaseDate = editModel.ReleaseDate
-                    };
-                    
-                    _context.Update(movie);
-                    _context.SaveChanges();
-                }
-                catch (DbUpdateException)
-                {
-                    if (!MovieExists(id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                    Id = id,
+                    Genre = editModel.Genre,
+                    Price = editModel.Price,
+                    Title = editModel.Title,
+                    ReleaseDate = editModel.ReleaseDate
+                };
+
+                _context.Update(movie);
+                _context.SaveChanges();
             }
-            return View(editModel);
+            catch (DbUpdateException)
+            {
+                if (MovieExists(id))
+                {
+                    throw;
+                }
+
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
-        
+
         [HttpGet]
         // GET: Movies/Delete/5
         public IActionResult Delete(int? id)
@@ -166,13 +162,13 @@ namespace MoviesApp.Controllers
             }
 
             var deleteModel = _context.Movies.Where(m => m.Id == id).Select(m => new DeleteMovieViewModel
-            {
-                Genre = m.Genre,
-                Price = m.Price,
-                Title = m.Title,
-                ReleaseDate = m.ReleaseDate
-            }).FirstOrDefault();
-            
+                {
+                    Genre = m.Genre,
+                    Price = m.Price,
+                    Title = m.Title,
+                    ReleaseDate = m.ReleaseDate
+                }).FirstOrDefault();
+
             if (deleteModel == null)
             {
                 return NotFound();
@@ -180,16 +176,18 @@ namespace MoviesApp.Controllers
 
             return View(deleteModel);
         }
-        
+
         // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             var movie = _context.Movies.Find(id);
+            if (movie == null) return RedirectToAction(nameof(Index));
             _context.Movies.Remove(movie);
             _context.SaveChanges();
-            _logger.LogError($"Movie with id {movie.Id} has been deleted!");
+            _logger.LogError("Movie with id {MovieId} has been deleted!", movie.Id);
+
             return RedirectToAction(nameof(Index));
         }
 

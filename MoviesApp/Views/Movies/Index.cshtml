@@ -17,7 +17,7 @@
             <label asp-for="@Model.First().Title"></label>
         </th>
         <th>
-             <label asp-for="@Model.First().ReleaseDate"></label>
+            <label asp-for="@Model.First().ReleaseDate"></label>
         </th>
         <th>
             <label asp-for="@Model.First().Genre"></label>
@@ -29,7 +29,8 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model) {
+    @foreach (var item in Model)
+    {
         <tr>
             <td>
                 @item.Title
@@ -42,6 +43,12 @@
             </td>
             <td>
                 @item.Price
+            </td>
+            <td>
+                @foreach (var a in item.Actors)
+                {
+                    <b>@a.Name</b>
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
