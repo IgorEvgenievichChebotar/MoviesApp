@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using MoviesApp.Models;
+using MoviesApp.ViewModels.Movie;
 
-namespace MoviesApp.ViewModels;
+namespace MoviesApp.ViewModels.Actor;
 
 public class InputActorViewModel
 {

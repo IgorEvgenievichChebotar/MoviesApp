@@ -1,4 +1,4 @@
-﻿namespace MoviesApp.ViewModels;
+﻿namespace MoviesApp.ViewModels.Actor;
 
 public class DeleteActorViewModel:InputActorViewModel
 {

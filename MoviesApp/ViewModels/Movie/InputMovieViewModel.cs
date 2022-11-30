@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using MoviesApp.Models;
+using MoviesApp.ViewModels.Actor;
 
-namespace MoviesApp.ViewModels
+namespace MoviesApp.ViewModels.Movie
 {
     public class InputMovieViewModel
     {
@@ -13,6 +13,6 @@ namespace MoviesApp.ViewModels
         public DateTime ReleaseDate { get; set; }
         public string Genre { get; set; }
         public decimal Price { get; set; }
-        public virtual ICollection<ActorViewModel> Actors { get; set; } = new List<ActorViewModel>();
+        public ICollection<ActorViewModel> Actors { get; set; } = new List<ActorViewModel>();
     }
 }

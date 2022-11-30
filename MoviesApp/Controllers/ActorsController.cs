@@ -5,15 +5,17 @@ using Microsoft.Extensions.Logging;
 using MoviesApp.Data;
 using MoviesApp.Models;
 using MoviesApp.ViewModels;
+using MoviesApp.ViewModels.Actor;
+using MoviesApp.ViewModels.Movie;
 
 namespace MoviesApp.Controllers;
 
 public class ActorsController : Controller
 {
     private readonly MoviesContext _context;
-    private readonly ILogger<HomeController> _logger;
+    private readonly ILogger<ActorsController> _logger;
 
-    public ActorsController(MoviesContext context, ILogger<HomeController> logger)
+    public ActorsController(MoviesContext context, ILogger<ActorsController> logger)
     {
         _context = context;
         _logger = logger;
