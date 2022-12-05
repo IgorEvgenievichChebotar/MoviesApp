@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -26,10 +28,12 @@ public class RequestActorsLoggingMiddleware
             if (context.Request.Path.ToString().Contains("Actors"))
             {
                 _logger.LogInformation(
-                    "Request: {Method} {Url} => {StatusCode}",
-                    context.Request?.Method,
-                    context.Request?.Path.Value,
-                    context.Response?.StatusCode);
+                    "Request: {Method} {Url} => {StatusCode}; {Query}; {@Body};",
+                    context.Request.Method,
+                    context.Request.Path.Value,
+                    context.Response.StatusCode,
+                    context.Request.QueryString.Value,
+                    await new StreamReader(context.Request.Body).ReadToEndAsync());
             }
         }
     }
