@@ -40,6 +40,8 @@ namespace MoviesApp
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<RequestActorsLoggingMiddleware>();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
