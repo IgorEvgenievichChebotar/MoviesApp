@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace MoviesApp;
+namespace MoviesApp.Middlewares;
 
 public class RequestActorsLoggingMiddleware
 {

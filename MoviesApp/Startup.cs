@@ -8,18 +8,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MoviesApp.Data;
+using MoviesApp.Filters;
+using MoviesApp.Middlewares;
 
 namespace MoviesApp
 {
     public class Startup
     {
         private IConfiguration Configuration { get; }
-        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -28,18 +30,17 @@ namespace MoviesApp
 
             services.AddDbContext<MoviesContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("MoviesContext")));
-            
+
             services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseMiddleware<RequestActorsLoggingMiddleware>();
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseRequestLoggingToActors();
             }
 
             app.UseHttpsRedirection();
@@ -48,7 +49,7 @@ namespace MoviesApp
             app.UseRouting();
 
             app.UseAuthorization();
-            
+
             IList<CultureInfo> supportedCultures = new[]
             {
                 new CultureInfo("en-US"),
