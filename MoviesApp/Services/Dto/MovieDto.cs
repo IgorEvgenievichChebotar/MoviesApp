@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MoviesApp.Services.Dto;
@@ -23,5 +24,5 @@ public class MovieDto
     [Range(0, 999.99)]
     public decimal Price { get; set; }
 
-    /*public virtual IEnumerable<ActorDto> Actors { get; } = new List<ActorDto>();*/
+    public IEnumerable<ActorDto> Actors { get; } = new List<ActorDto>();
 }

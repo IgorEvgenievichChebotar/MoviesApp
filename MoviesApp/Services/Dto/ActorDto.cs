@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using MoviesApp.Filters;
 
@@ -21,5 +22,5 @@ public class ActorDto
     [EnsureActorsAge]
     public DateTime BirthDate { get; set; }
 
-    /*public virtual IEnumerable<MovieDto> Movies { get; } = new List<MovieDto>();*/
+    public IEnumerable<MovieDto> Movies { get; } = new List<MovieDto>();
 }
