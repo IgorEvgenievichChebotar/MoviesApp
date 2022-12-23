@@ -8,8 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MoviesApp.Data;
-using MoviesApp.Filters;
 using MoviesApp.Middlewares;
+using MoviesApp.Services;
+using MoviesApp.Services.Implementation;
 
 namespace MoviesApp
 {
@@ -32,6 +33,9 @@ namespace MoviesApp
                 options.UseSqlServer(Configuration.GetConnectionString("MoviesContext")));
 
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddScoped<IActorsService, ActorsService>();
+            services.AddScoped<IMovieService, MovieService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

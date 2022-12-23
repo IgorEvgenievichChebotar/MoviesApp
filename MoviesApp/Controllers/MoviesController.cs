@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MoviesApp.Data;
 using MoviesApp.Models;
-using MoviesApp.ViewModels;
-using MoviesApp.ViewModels.Actor;
 using MoviesApp.ViewModels.Movie;
 
 namespace MoviesApp.Controllers
@@ -73,7 +71,7 @@ namespace MoviesApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(_mapper.Map<Movie>(inputModel));
+                _context.Add((object)_mapper.Map<Movie>(inputModel));
                 _context.SaveChanges();
 
                 return RedirectToAction(nameof(Index));

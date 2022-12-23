@@ -24,7 +24,8 @@ public class RequestActorsLoggingMiddleware
         }
         finally
         {
-            if (context.Request.Path.ToString().Contains("Actors"))
+            var reqPath = context.Request.Path.ToString();
+            if (reqPath.Contains("Actors") || reqPath.Contains("actors"))
             {
                 _logger.LogInformation(
                     "Request: {Method} {Url} => {StatusCode}; {Query}; {@Body};",
