@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,23 +14,24 @@ namespace MoviesApp.Controllers;
 
 public class ActorsController : Controller
 {
-    private readonly MoviesContext _context;
+    private readonly MoviesContext _moviesContext;
     private readonly ILogger<ActorsController> _logger;
     private readonly IMapper _mapper;
 
-    public ActorsController(MoviesContext context, ILogger<ActorsController> logger, IMapper mapper)
+    public ActorsController(MoviesContext moviesContext, ILogger<ActorsController> logger, IMapper mapper)
     {
-        _context = context;
+        _moviesContext = moviesContext;
         _logger = logger;
         _mapper = mapper;
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult Index()
     {
         var list = _mapper.Map<ICollection<ActorViewModel>>
         (
-            _context.Actors.Include(a => a.Movies)
+            _moviesContext.Actors.Include(a => a.Movies)
         );
 
         return View(list);
@@ -44,20 +46,23 @@ public class ActorsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [EnsureActorsAge]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create([Bind("Name,LastName,BirthDate")] InputActorViewModel inputModel)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            _context.Add(_mapper.Map<Actor>(inputModel));
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Index));
+            return View(inputModel);
         }
 
-        return View(inputModel);
+        _moviesContext.Add((object)_mapper.Map<Actor>(inputModel));
+        _moviesContext.SaveChanges();
+
+        return RedirectToAction(nameof(Index));
+
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult Details(int? id)
     {
         if (id == null)
@@ -65,7 +70,7 @@ public class ActorsController : Controller
             return NotFound();
         }
 
-        var viewModel = _mapper.Map<ActorViewModel>(_context.Actors.FirstOrDefault(a => a.Id == id));
+        var viewModel = _mapper.Map<ActorViewModel>(_moviesContext.Actors.FirstOrDefault(a => a.Id == id));
 
 
         if (viewModel == null)
@@ -77,6 +82,7 @@ public class ActorsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Edit(int? id)
     {
         if (id == null)
@@ -84,7 +90,7 @@ public class ActorsController : Controller
             return NotFound();
         }
 
-        var editModel = _mapper.Map<EditActorViewModel>(_context.Actors.FirstOrDefault(a => a.Id == id));
+        var editModel = _mapper.Map<EditActorViewModel>(_moviesContext.Actors.FirstOrDefault(a => a.Id == id));
 
         if (editModel == null)
         {
@@ -97,6 +103,7 @@ public class ActorsController : Controller
     [HttpPost]
     [EnsureActorsAge]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public IActionResult Edit(int id, [Bind("Name,LastName,BirthDate")] EditActorViewModel editModel)
     {
         if (!ModelState.IsValid) return View(editModel);
@@ -104,8 +111,8 @@ public class ActorsController : Controller
         {
             var actor = _mapper.Map<Actor>(editModel);
 
-            _context.Update(actor);
-            _context.SaveChanges();
+            _moviesContext.Update(actor);
+            _moviesContext.SaveChanges();
         }
         catch (DbUpdateException)
         {
@@ -121,6 +128,7 @@ public class ActorsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int? id)
     {
         if (id == null)
@@ -128,7 +136,7 @@ public class ActorsController : Controller
             return NotFound();
         }
 
-        var deleteModel = _mapper.Map<DeleteActorViewModel>(_context.Actors.FirstOrDefault(a => a.Id == id));
+        var deleteModel = _mapper.Map<DeleteActorViewModel>(_moviesContext.Actors.FirstOrDefault(a => a.Id == id));
 
         if (deleteModel == null)
         {
@@ -140,12 +148,13 @@ public class ActorsController : Controller
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public IActionResult DeleteConfirmed(int id)
     {
-        var actor = _context.Actors.Find(id);
+        var actor = _moviesContext.Actors.Find(id);
         if (actor == null) return RedirectToAction(nameof(Index));
-        _context.Actors.Remove(actor);
-        _context.SaveChanges();
+        _moviesContext.Actors.Remove(actor);
+        _moviesContext.SaveChanges();
         _logger.LogError("Actor with id {ActorId} has been deleted!", actor.Id);
 
         return RedirectToAction(nameof(Index));
@@ -153,6 +162,6 @@ public class ActorsController : Controller
 
     private bool ActorExists(int id)
     {
-        return _context.Actors.Any(a => a.Id == id);
+        return _moviesContext.Actors.Any(a => a.Id == id);
     }
 }

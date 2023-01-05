@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
-using MoviesApp.Models;
+﻿using AutoMapper;
 using MoviesApp.ViewModels.Actor;
 
-namespace MoviesApp.AutoMapperConfig;
+namespace MoviesApp.Models.AutoMapperProfiles;
 
 public class ActorProfile : Profile
 {

@@ -1,42 +1,37 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MoviesApp.Data;
 
-namespace MoviesApp
+namespace MoviesApp;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var host = CreateHostBuilder(args).Build();
+
+        using (var scope = host.Services.CreateScope())
         {
-            var host = CreateHostBuilder(args).Build();
+            var services = scope.ServiceProvider;
 
-            using (var scope = host.Services.CreateScope())
+            try
             {
-                var services = scope.ServiceProvider;
-
-                try
-                {
-                    SeedData.Initialize(services);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB");
-                }
+                SeedData.Initialize(services);
             }
-            
-            host.Run();
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred seeding the DB");
+            }
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+            
+        host.Run();
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
 }

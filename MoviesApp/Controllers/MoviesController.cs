@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,24 +13,25 @@ namespace MoviesApp.Controllers
 {
     public class MoviesController : Controller
     {
-        private readonly MoviesContext _context;
+        private readonly MoviesContext _moviesContext;
         private readonly ILogger<MoviesController> _logger;
         private readonly IMapper _mapper;
 
-        public MoviesController(MoviesContext context, ILogger<MoviesController> logger, IMapper mapper)
+        public MoviesController(MoviesContext moviesContext, ILogger<MoviesController> logger, IMapper mapper)
         {
-            _context = context;
+            _moviesContext = moviesContext;
             _logger = logger;
             _mapper = mapper;
         }
 
         // GET: Movies
         [HttpGet]
+        [Authorize]
         public IActionResult Index()
         {
             var movies = _mapper.Map<ICollection<MovieViewModel>>
             (
-                _context.Movies
+                _moviesContext.Movies
                     .Include(m => m.Actors)
             );
 
@@ -38,6 +40,7 @@ namespace MoviesApp.Controllers
 
         // GET: Movies/Details/5
         [HttpGet]
+        [Authorize]
         public IActionResult Details(int? id)
         {
             if (id == null)
@@ -45,7 +48,7 @@ namespace MoviesApp.Controllers
                 return NotFound();
             }
 
-            var viewModel = _mapper.Map<MovieViewModel>(_context.Movies.FirstOrDefault(m => m.Id == id));
+            var viewModel = _mapper.Map<MovieViewModel>(_moviesContext.Movies.FirstOrDefault(m => m.Id == id));
 
             if (viewModel == null)
             {
@@ -57,6 +60,7 @@ namespace MoviesApp.Controllers
 
         // GET: Movies/Create
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -67,20 +71,19 @@ namespace MoviesApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create([Bind("Title,ReleaseDate,Genre,Price")] InputMovieViewModel inputModel)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add((object)_mapper.Map<Movie>(inputModel));
-                _context.SaveChanges();
+            if (!ModelState.IsValid) return View(inputModel);
 
-                return RedirectToAction(nameof(Index));
-            }
+            _moviesContext.Add((object)_mapper.Map<Movie>(inputModel));
+            _moviesContext.SaveChanges();
 
-            return View(inputModel);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         // GET: Movies/Edit/5
         public IActionResult Edit(int? id)
         {
@@ -89,7 +92,7 @@ namespace MoviesApp.Controllers
                 return NotFound();
             }
 
-            var editModel = _mapper.Map<EditMovieViewModel>(_context.Movies.FirstOrDefault(m => m.Id == id));
+            var editModel = _mapper.Map<EditMovieViewModel>(_moviesContext.Movies.FirstOrDefault(m => m.Id == id));
 
             if (editModel == null)
             {
@@ -104,6 +107,7 @@ namespace MoviesApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id, [Bind("Title,ReleaseDate,Genre,Price")] EditMovieViewModel editModel)
         {
             if (!ModelState.IsValid) return View(editModel);
@@ -111,8 +115,8 @@ namespace MoviesApp.Controllers
             {
                 var movie = _mapper.Map<Movie>(editModel);
 
-                _context.Update(movie);
-                _context.SaveChanges();
+                _moviesContext.Update(movie);
+                _moviesContext.SaveChanges();
             }
             catch (DbUpdateException)
             {
@@ -128,6 +132,7 @@ namespace MoviesApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         // GET: Movies/Delete/5
         public IActionResult Delete(int? id)
         {
@@ -138,7 +143,7 @@ namespace MoviesApp.Controllers
 
             var deleteModel = _mapper.Map<DeleteMovieViewModel>
             (
-                _context.Movies.FirstOrDefault(m => m.Id == id)
+                _moviesContext.Movies.FirstOrDefault(m => m.Id == id)
             );
 
             if (deleteModel == null)
@@ -152,12 +157,13 @@ namespace MoviesApp.Controllers
         // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteConfirmed(int id)
         {
-            var movie = _context.Movies.Find(id);
+            var movie = _moviesContext.Movies.Find(id);
             if (movie == null) return RedirectToAction(nameof(Index));
-            _context.Movies.Remove(movie);
-            _context.SaveChanges();
+            _moviesContext.Movies.Remove(movie);
+            _moviesContext.SaveChanges();
             _logger.LogError("Movie with id {MovieId} has been deleted!", movie.Id);
 
             return RedirectToAction(nameof(Index));
@@ -165,7 +171,7 @@ namespace MoviesApp.Controllers
 
         private bool MovieExists(int id)
         {
-            return _context.Movies.Any(e => e.Id == id);
+            return _moviesContext.Movies.Any(e => e.Id == id);
         }
     }
 }

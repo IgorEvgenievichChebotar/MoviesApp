@@ -9,7 +9,7 @@ public class MovieDto
     public int? Id { get; set; }
         
     [Required]
-    [StringLength(32,ErrorMessage = "Title length can't be more than 32.")]
+    [StringLength(32, ErrorMessage = "Title length can't be more than 32.")]
     public string Title { get; set; }
         
         

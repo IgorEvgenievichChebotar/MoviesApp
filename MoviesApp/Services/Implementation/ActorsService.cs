@@ -9,36 +9,38 @@ namespace MoviesApp.Services.Implementation;
 
 public class ActorsService : IActorsService
 {
-    private readonly MoviesContext _context;
+    private readonly MoviesContext _moviesContext;
     private readonly IMapper _mapper;
 
-    public ActorsService(IMapper mapper, MoviesContext context)
+    public ActorsService(IMapper mapper, MoviesContext moviesContext)
     {
         _mapper = mapper;
-        _context = context;
+        _moviesContext = moviesContext;
     }
 
     public ICollection<ActorDto> FindAll()
     {
-        return _mapper.Map<ICollection<ActorDto>>(_context.Actors.ToList());
+        return _mapper.Map<ICollection<ActorDto>>(
+            _moviesContext.Actors/*.Include(a => a.Movies)*/
+                .ToList());
     }
 
     public ActorDto FindById(int id)
     {
-        return _mapper.Map<ActorDto>(_context.Actors.Find(id));
+        return _mapper.Map<ActorDto>(_moviesContext.Actors.Find(id));
     }
 
     public ActorDto Create(ActorDto actorDto)
     {
-        var actor = _context.Actors.Add(_mapper.Map<Actor>(actorDto)).Entity;
-        _context.SaveChanges();
+        var actor = _moviesContext.Actors.Add(_mapper.Map<Actor>(actorDto)).Entity;
+        _moviesContext.SaveChanges();
         return _mapper.Map<ActorDto>(actor);
     }
 
     public ActorDto Update(ActorDto actorDto, int id)
     {
-        var isExists = _context.Actors.Any(a => a.Id == id);
-        
+        var isExists = _moviesContext.Actors.Any(a => a.Id == id);
+
         if (!isExists)
         {
             return null; //todo
@@ -46,22 +48,22 @@ public class ActorsService : IActorsService
 
         var actor = _mapper.Map<Actor>(actorDto);
         actor.Id = id;
-        _context.Actors.Update(actor);
-        _context.SaveChanges();
+        _moviesContext.Actors.Update(actor);
+        _moviesContext.SaveChanges();
         return _mapper.Map<ActorDto>(actor);
     }
 
     public ActorDto Delete(int id)
     {
-        var actor = _context.Actors.Find(id);
+        var actor = _moviesContext.Actors.Find(id);
 
         if (actor == null)
         {
             return null; //todo
         }
 
-        _context.Actors.Remove(actor);
-        _context.SaveChanges();
+        _moviesContext.Actors.Remove(actor);
+        _moviesContext.SaveChanges();
         return _mapper.Map<ActorDto>(actor);
     }
 }
