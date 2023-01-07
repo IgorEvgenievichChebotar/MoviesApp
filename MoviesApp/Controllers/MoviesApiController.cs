@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MoviesApp.Services;
 using MoviesApp.Services.Dto;
@@ -18,6 +19,7 @@ public class MoviesApiController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(ICollection<MovieDto>))]
+    [Authorize]
     public IActionResult FindAll()
     {
         return Ok(_service.FindAll());
@@ -26,6 +28,7 @@ public class MoviesApiController : ControllerBase
     [HttpGet("{id:int}")]
     [ProducesResponseType(200, Type = typeof(MovieDto))]
     [ProducesResponseType(204)]
+    [Authorize]
     public IActionResult FindById(int id)
     {
         var movie = _service.FindById(id);
@@ -41,6 +44,7 @@ public class MoviesApiController : ControllerBase
     [HttpPost]
     [ProducesResponseType(201, Type = typeof(MovieDto))]
     /*[ProducesResponseType(400)]*/ //todo
+    [Authorize(Roles = "Admin")]
     public IActionResult Create(MovieDto MovieDto)
     {
         return Created("FindById", _service.Create(MovieDto));
@@ -49,6 +53,7 @@ public class MoviesApiController : ControllerBase
     [HttpPut("{id:int}")]
     [ProducesResponseType(200, Type = typeof(MovieDto))]
     [ProducesResponseType(204)]
+    [Authorize(Roles = "Admin")]
     public IActionResult Update(int id, MovieDto movieDto)
     {
         if (_service.FindById(id) == null)
@@ -62,6 +67,7 @@ public class MoviesApiController : ControllerBase
     [HttpDelete("{id:int}")]
     [ProducesResponseType(200, Type = typeof(MovieDto))]
     [ProducesResponseType(204)]
+    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int id)
     {
         if (_service.FindById(id) == null)
